@@ -1,3 +1,4 @@
+const API_KEY = 'AIzaSyCwAC0zuVch-59OF91XtqRhcJcb6qMpK9Q';
 const chatContainer = document.getElementById('chat-container');
 const userInput = document.getElementById('user-input');
 const sendButton = document.getElementById('send-button');
@@ -25,23 +26,14 @@ async function sendMessage() {
         userInput.value = '';
 
         try {
-            const response = await axios.post(
-                'https://api.anthropic.com/v1/messages',
-                {
-                    model: 'claude-3-sonnet-20240229',
-                    max_tokens: 1024,
-                    messages: [{ role: 'user', content: message }]
-                },
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-api-key': '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'
-                    }
-                }
-            );
+            const genAI = new GoogleGenerativeAI(API_KEY);
+            const model = genAI.getGenerativeModel({ model: "gemini-pro"});
 
-            const assistantMessage = response.data.content[0].text;
-            addMessage(assistantMessage, false);
+            const result = await model.generateContent(message);
+            const response = await result.response;
+            const text = response.text();
+
+            addMessage(text, false);
         } catch (error) {
             console.error('Error:', error);
             addMessage('Sorry, there was an error processing your request.', false);
